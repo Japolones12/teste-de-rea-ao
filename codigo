@@ -1,0 +1,76 @@
+import pygame
+import random
+import time
+
+# Inicializa o Pygame
+pygame.init()
+
+# Configurações da tela
+largura, altura = 1920, 1080
+tela = pygame.display.set_mode((largura, altura))
+pygame.display.set_caption('Teste de Reação')
+
+# Cores
+vermelho = (255, 0, 0)
+verde = (0, 255, 0)
+preto = (0, 0, 0)
+
+# Fontes
+fonte = pygame.font.SysFont(None, 55)
+
+# Função para desenhar o bloco
+def desenha_bloco(x, y, cor):
+    pygame.draw.rect(tela, cor, [x, y, 100, 100])
+
+# Função principal do jogo
+def jogo():
+    nivel = 1
+    tempo_total = 0
+    tempo_inicio = time.time()
+    
+    while nivel <= 15:
+        bloco_x = random.randint(0, largura - 100)
+        bloco_y = random.randint(0, altura - 100)
+        tempo_espera = random.uniform(10, 15)
+        tempo_inicial_bloco = time.time()
+        
+        bloco_cor = vermelho
+        clicado = False
+        
+        while not clicado:
+            for evento in pygame.event.get():
+                if evento.type == pygame.QUIT:
+                    pygame.quit()
+                    return
+                if evento.type == pygame.MOUSEBUTTONDOWN:
+                    if bloco_cor == verde:
+                        tempo_fim = time.time()
+                        tempo_total += tempo_fim - tempo_inicio
+                        clicado = True
+                    else:
+                        print("Você clicou no bloco vermelho! Game Over.")
+                        pygame.quit()
+                        return
+
+            tempo_atual_bloco = time.time()
+            if tempo_atual_bloco - tempo_inicial_bloco >= tempo_espera:
+                bloco_cor = verde
+
+            tela.fill(preto)
+            desenha_bloco(bloco_x, bloco_y, bloco_cor)
+            
+            tempo_decorrido = time.time() - tempo_inicio
+            cronometro = fonte.render(f"Tempo: {tempo_decorrido:.2f}", True, (255, 255, 255))
+            tela.blit(cronometro, (largura - 200, 20))
+
+            pygame.display.flip()
+            pygame.time.delay(100)
+        
+        nivel += 1
+        tempo_inicio = time.time()
+        pygame.time.delay(1000)  # Pequena pausa entre níveis
+
+    print(f"Você completou todos os níveis em {tempo_total:.2f} segundos!")
+    pygame.quit()
+
+jogo()
