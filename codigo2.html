@@ -20,6 +20,7 @@
             width: 100vw;
             height: 100vh;
             overflow: hidden;
+            display: none;
         }
         #block {
             position: absolute;
@@ -41,9 +42,24 @@
             font-size: 32px;
             text-align: center;
         }
+        #menu {
+            text-align: center;
+        }
+        #start-button {
+            padding: 15px 30px;
+            font-size: 24px;
+            cursor: pointer;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
+    <div id="menu">
+        <button id="start-button">Começar</button>
+    </div>
     <div id="game-container">
         <div id="block"></div>
         <div id="timer">Tempo: 0.00</div>
@@ -55,6 +71,8 @@
         const timerElement = document.getElementById('timer');
         const messageElement = document.getElementById('message');
         const container = document.getElementById('game-container');
+        const menu = document.getElementById('menu');
+        const startButton = document.getElementById('start-button');
 
         let startTime;
         let level = 1;
@@ -62,14 +80,17 @@
         let blockVisible = false;
 
         function startGame() {
-            level = 1;
+            menu.style.display = 'none';
+            container.style.display = 'block';
             startLevel();
         }
 
         function startLevel() {
-            messageElement.textContent = '';
             moveBlock();
+            block.style.backgroundColor = 'red';
+            blockVisible = true;
             startTime = Date.now();
+            
             const waitTime = Math.random() * 5000 + 5000; // Tempo entre 5 e 10 segundos
 
             interval = setTimeout(() => {
@@ -100,15 +121,16 @@
         }
 
         function updateTimer() {
-            const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(2);
-            timerElement.textContent = `Tempo: ${elapsedTime}`;
+            if (blockVisible) {
+                const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(2);
+                timerElement.textContent = `Tempo: ${elapsedTime}`;
+            }
         }
 
+        startButton.addEventListener('click', startGame);
         block.addEventListener('click', handleBlockClick);
 
         setInterval(updateTimer, 100);
-
-        startGame();
     </script>
 </body>
 </html>
