@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Reação</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #000;
+            color: #fff;
+            font-family: Arial, sans-serif;
+        }
+        #game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+        #block {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background-color: red;
+        }
+        #timer {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 24px;
+        }
+        #message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 32px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <div id="block"></div>
+        <div id="timer">Tempo: 0.00</div>
+        <div id="message"></div>
+    </div>
+
+    <script>
+        const block = document.getElementById('block');
+        const timerElement = document.getElementById('timer');
+        const messageElement = document.getElementById('message');
+        const container = document.getElementById('game-container');
+
+        let startTime;
+        let level = 1;
+        let interval;
+        let blockVisible = false;
+
+        function startGame() {
+            level = 1;
+            startLevel();
+        }
+
+        function startLevel() {
+            messageElement.textContent = '';
+            moveBlock();
+            startTime = Date.now();
+            const waitTime = Math.random() * 5000 + 5000; // Tempo entre 5 e 10 segundos
+
+            interval = setTimeout(() => {
+                if (blockVisible) {
+                    block.style.backgroundColor = 'green';
+                    blockVisible = false;
+                }
+            }, waitTime);
+        }
+
+        function moveBlock() {
+            const x = Math.random() * (container.clientWidth - 100);
+            const y = Math.random() * (container.clientHeight - 100);
+            block.style.left = `${x}px`;
+            block.style.top = `${y}px`;
+        }
+
+        function handleBlockClick() {
+            if (block.style.backgroundColor === 'green') {
+                level++;
+                clearTimeout(interval);
+                startLevel();
+            } else {
+                messageElement.textContent = 'Você clicou no bloco vermelho! Game Over.';
+                block.style.display = 'none';
+                clearTimeout(interval);
+            }
+        }
+
+        function updateTimer() {
+            const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(2);
+            timerElement.textContent = `Tempo: ${elapsedTime}`;
+        }
+
+        block.addEventListener('click', handleBlockClick);
+
+        setInterval(updateTimer, 100);
+
+        startGame();
+    </script>
+</body>
+</html>
