@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Mira</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: black;
+        }
+        .bola {
+            position: absolute;
+            border-radius: 50%;
+            background-color: red;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        const largura = window.innerWidth;
+        const altura = window.innerHeight;
+        const maxBolinhas = 5;
+        let bolinhas = [];
+        let acertos = 0;
+        let tempoMinimo = 1000; // milissegundos
+        let tempoMaximo = 3000; // milissegundos
+
+        function criarBola() {
+            const bola = document.createElement('div');
+            bola.className = 'bola';
+            const tamanho = Math.random() * 50 + 20; // Tamanho entre 20 e 70
+            bola.style.width = bola.style.height = `${tamanho}px`;
+            bola.style.top = `${Math.random() * (altura - tamanho)}px`;
+            bola.style.left = `${Math.random() * (largura - tamanho)}px`;
+
+            const tempoDesaparecer = Math.random() * (tempoMaximo - tempoMinimo) + tempoMinimo;
+            bola.dataset.tempoDesaparecer = tempoDesaparecer;
+            bola.dataset.startTime = Date.now();
+
+            document.body.appendChild(bola);
+            bolinhas.push(bola);
+
+            setTimeout(() => {
+                if (document.body.contains(bola)) {
+                    document.body.removeChild(bola);
+                    bolinhas = bolinhas.filter(b => b !== bola);
+                }
+            }, tempoDesaparecer);
+        }
+
+        function atualizarBolinhas() {
+            const agora = Date.now();
+            bolinhas.forEach(bola => {
+                const tempoInicio = parseFloat(bola.dataset.startTime);
+                const tempoDesaparecer = parseFloat(bola.dataset.tempoDesaparecer);
+                const tempoDecorrido = agora - tempoInicio;
+
+                if (tempoDecorrido > tempoDesaparecer) {
+                    document.body.removeChild(bola);
+                    bolinhas = bolinhas.filter(b => b !== bola);
+                } else {
+                    const proporcao = 1 - (tempoDecorrido / tempoDesaparecer);
+                    const tamanho = proporcao * (Math.random() * 50 + 20);
+                    bola.style.width = bola.style.height = `${tamanho}px`;
+                }
+            });
+
+            if (bolinhas.length < maxBolinhas) {
+                criarBola();
+            }
+        }
+
+        document.addEventListener('click', (event) => {
+            const target = event.target;
+            if (target.classList.contains('bola')) {
+                document.body.removeChild(target);
+                bolinhas = bolinhas.filter(b => b !== target);
+                acertos++;
+                tempoMinimo = Math.max(500, tempoMinimo - 100);
+                tempoMaximo = Math.max(1000, tempoMaximo - 200);
+            }
+        });
+
+        setInterval(atualizarBolinhas, 30); // Atualiza a cada 30 ms
+    </script>
+</body>
+</html>
