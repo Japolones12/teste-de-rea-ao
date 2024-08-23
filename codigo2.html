@@ -22,11 +22,18 @@
             overflow: hidden;
             display: none;
         }
-        #block {
+        #block, .fake-block {
             position: absolute;
             width: 100px;
             height: 100px;
             background-color: red;
+        }
+        #fake-blocks {
+            position: absolute;
+            pointer-events: none;
+        }
+        .fake-block {
+            background-color: lightgreen;
         }
         #timer {
             position: absolute;
@@ -62,12 +69,14 @@
     </div>
     <div id="game-container">
         <div id="block"></div>
+        <div id="fake-blocks"></div>
         <div id="timer">Tempo: 0.00</div>
         <div id="message"></div>
     </div>
 
     <script>
         const block = document.getElementById('block');
+        const fakeBlocksContainer = document.getElementById('fake-blocks');
         const timerElement = document.getElementById('timer');
         const messageElement = document.getElementById('message');
         const container = document.getElementById('game-container');
@@ -78,6 +87,8 @@
         let level = 1;
         let interval;
         let blockVisible = false;
+        let fakeBlocks = [];
+        const numFakeBlocks = 5;
 
         function startGame() {
             menu.style.display = 'none';
@@ -91,8 +102,11 @@
             blockVisible = true;
             startTime = Date.now();
             
-            const waitTime = Math.random() * 5000 + 5000; // Tempo entre 5 e 10 segundos
+            if (level > 5) {
+                createFakeBlocks();
+            }
 
+            const waitTime = Math.random() * 5000 + 5000;
             interval = setTimeout(() => {
                 if (blockVisible) {
                     block.style.backgroundColor = 'green';
@@ -106,6 +120,26 @@
             const y = Math.random() * (container.clientHeight - 100);
             block.style.left = `${x}px`;
             block.style.top = `${y}px`;
+        }
+
+        function createFakeBlocks() {
+            fakeBlocks.forEach(block => block.remove());
+            fakeBlocks = [];
+            for (let i = 0; i < numFakeBlocks; i++) {
+                const fakeBlock = document.createElement('div');
+                fakeBlock.className = 'fake-block';
+                fakeBlocksContainer.appendChild(fakeBlock);
+                fakeBlocks.push(fakeBlock);
+                moveFakeBlock(fakeBlock);
+            }
+        }
+
+        function moveFakeBlock(block) {
+            const x = Math.random() * (container.clientWidth - 100);
+            const y = Math.random() * (container.clientHeight - 100);
+            block.style.left = `${x}px`;
+            block.style.top = `${y}px`;
+            setTimeout(() => moveFakeBlock(block), 1000);
         }
 
         function handleBlockClick() {
